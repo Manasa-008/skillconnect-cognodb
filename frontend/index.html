@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillConnect</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">SkillConnect</div>
+        <nav>
+            <a href="#jobs">Jobs</a>
+            <a href="#candidates">Candidates</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div>
+                <p class="eyebrow">GRAPH-POWERED TALENT MATCHING</p>
+                <h1>Find the right skills for every opportunity.</h1>
+                <p class="hero-text">
+                    Explore jobs, discover matching candidates, and uncover
+                    skill recommendations through professional connections.
+                </p>
+            </div>
+        </section>
+
+        <section id="jobs" class="section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">OPPORTUNITIES</p>
+                    <h2>Available Jobs</h2>
+                </div>
+            </div>
+
+            <div id="jobs-container" class="jobs-grid">
+                <div class="loading">Loading jobs...</div>
+            </div>
+        </section>
+
+        <section id="candidates" class="section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">PEOPLE</p>
+                    <h2>Candidate Profile</h2>
+                </div>
+            </div>
+
+            <div id="candidate-container">
+                <div class="empty-state">
+                    Select a candidate from the matching results.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
