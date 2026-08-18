@@ -153,17 +153,17 @@ app.get("/api/candidates/:candidateId/recommendations", async (req, res) => {
     try {
         const result = await session.run(
             `
-                  MATCH (c:Candidate {id: $candidateId})-[:CONNECTED_TO]->(connected:Candidate)-[:HAS_SKILL]->(s:Skill)
-    WITH c, connected, collect(s.name) AS connectedSkills
-    MATCH (c)-[:HAS_SKILL]->(mySkill:Skill)
-    WITH connected, connectedSkills, collect(mySkill.name) AS currentSkills
-    UNWIND connectedSkills AS skill
-    WITH connected, skill, currentSkills
-    WHERE NOT skill IN currentSkills
-    RETURN
-        connected.name AS connectedCandidate,
-        collect(skill) AS recommendedSkills
-    ORDER BY connectedCandidate
+            MATCH (c:Candidate {id: $candidateId})-[:CONNECTED_TO]->(connected:Candidate)-[:HAS_SKILL]->(s:Skill)
+            WITH c, connected, collect(s.name) AS connectedSkills
+            MATCH (c)-[:HAS_SKILL]->(mySkill:Skill)
+            WITH connected, connectedSkills, collect(mySkill.name) AS currentSkills
+            UNWIND connectedSkills AS skill
+            WITH connected, skill, currentSkills
+            WHERE NOT skill IN currentSkills
+            RETURN
+                connected.name AS connectedCandidate,
+                collect(skill) AS recommendedSkills
+            ORDER BY connectedCandidate
             `,
             { candidateId }
         );
@@ -184,9 +184,4 @@ app.get("/api/candidates/:candidateId/recommendations", async (req, res) => {
     }
 });
 
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;
