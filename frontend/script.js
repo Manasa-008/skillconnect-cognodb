@@ -1,4 +1,4 @@
-const API_BASE = "https://skillconnect-cognodb-4d5e3dbao-skill-connect2.vercel.app";
+const API_BASE = "";
 
 const jobsContainer = document.getElementById("jobs-container");
 const candidateContainer = document.getElementById("candidate-container");

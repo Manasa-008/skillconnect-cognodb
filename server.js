@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -8,21 +9,31 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("frontend"));
+app.use(express.static(path.join(__dirname, "frontend")));
 
 app.get("/", (req, res) => {
-    res.json({ message: "SkillConnect API is running" });
+    res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
 
 app.get("/test-db", async (req, res) => {
-    try {
-        const session = driver.session();
-        const result = await session.run("RETURN 'CognоDB connected successfully' AS message");
-        await session.close();
+    const session = driver.session();
 
-        res.json({ message: result.records[0].get("message") });
+    try {
+        const result = await session.run(
+            "RETURN 'CognоDB connected successfully' AS message"
+        );
+
+        res.json({
+            message: result.records[0].get("message")
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Database connection failed:", error.message);
+
+        res.status(500).json({
+            error: error.message
+        });
+    } finally {
+        await session.close();
     }
 });
 
@@ -50,6 +61,7 @@ app.get("/api/jobs", async (req, res) => {
         res.json(jobs);
     } catch (error) {
         console.error("Failed to fetch jobs:", error.message);
+
         res.status(500).json({
             error: "Unable to fetch jobs"
         });
@@ -86,6 +98,7 @@ app.get("/api/jobs/:jobId/matches", async (req, res) => {
         res.json(matches);
     } catch (error) {
         console.error("Failed to find job matches:", error.message);
+
         res.status(500).json({
             error: "Unable to find job matches"
         });
@@ -138,6 +151,7 @@ app.get("/api/candidates/:candidateId", async (req, res) => {
         });
     } catch (error) {
         console.error("Failed to fetch candidate:", error.message);
+
         res.status(500).json({
             error: "Unable to fetch candidate"
         });
@@ -155,14 +169,19 @@ app.get("/api/candidates/:candidateId/recommendations", async (req, res) => {
             `
             MATCH (c:Candidate {id: $candidateId})-[:CONNECTED_TO]->(connected:Candidate)-[:HAS_SKILL]->(s:Skill)
             WITH c, connected, collect(s.name) AS connectedSkills
+
             MATCH (c)-[:HAS_SKILL]->(mySkill:Skill)
             WITH connected, connectedSkills, collect(mySkill.name) AS currentSkills
+
             UNWIND connectedSkills AS skill
+
             WITH connected, skill, currentSkills
             WHERE NOT skill IN currentSkills
+
             RETURN
                 connected.name AS connectedCandidate,
                 collect(skill) AS recommendedSkills
+
             ORDER BY connectedCandidate
             `,
             { candidateId }
@@ -176,6 +195,7 @@ app.get("/api/candidates/:candidateId/recommendations", async (req, res) => {
         res.json(recommendations);
     } catch (error) {
         console.error("Failed to fetch recommendations:", error.message);
+
         res.status(500).json({
             error: "Unable to fetch recommendations"
         });
@@ -183,5 +203,13 @@ app.get("/api/candidates/:candidateId/recommendations", async (req, res) => {
         await session.close();
     }
 });
+
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 
 module.exports = app;
